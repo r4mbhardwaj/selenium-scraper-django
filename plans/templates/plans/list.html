@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block body %}
+
+<div class="row">
+    <h1 class="center">Plans</h1>
+
+    <!-- django listview -->
+    <div class="col s12 m6">
+        <h4>Normal</h4>
+
+        {% for object in object_list %}
+
+
+        <a class="col s12 m4" href="#{{forloop.counter}}!">
+
+            <div class="card-panel teal">
+                <span class="white-text">
+                    <h5>{{ object.price }} Rs.</h5>
+                    <h6>{{ object.extra_data }}</h6>
+                    <p>
+                        {% for key, value in object.benifits.items %}
+                        <span class="chip">{{ key }} {{ value }}</span>
+                        {% endfor %}
+                    </p>
+
+                </span>
+            </div>
+
+        </a>
+
+
+        {% endfor %}
+
+    </div>
+    <div class="col s12 m6">
+        <h4>Ajax</h4>
+        <div class="row">
+            <div id="ajax"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function get_template(plan) {
+        benifits_ = ""
+        for (var key in plan.benifits) {
+            benifits_ += `<span class="chip">${key} ${plan.benifits[key]}</span>`
+        }
+
+        template = `
+<a class="col s12 m4" href="#` + plan.id + `!">
+
+<div class="card-panel teal">
+    <span class="white-text">
+        <h5>` + plan.price + ` Rs.</h5>
+        <h6>` + plan.extra_data +  `</h6>
+        <p>
+            ` + benifits_ + `
+        </p>
+
+    </span>
+</div>
+
+</a>
+
+`
+        return template
+    }
+
+
+    $(document).ready(function () {
+        $.ajax({
+            url: "/api/plans/",
+            type: "GET",
+            success: function (data) {
+                console.log(data)
+                $('#ajax').html(data);
+                for (var i = 0; i < data.length; i++) {
+                    $('#ajax').append(get_template(data[i]))
+                }
+            }
+        });
+    });
+</script>
+
+{% endblock body %}
